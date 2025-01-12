@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LIVELIST</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            transition: background-color 0.3s, color 0.3s;
+            display: flex;
+            flex-direction: column;
+            min-height: 90vh;
+            margin: 0;
+        }
+
+        #list-input {
+            width: 100%;
+            height: 150px;
+            margin-bottom: 20px;
+            font-size: 16px;
+            padding: 10px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        #list-output {
+            margin-top: 20px;
+            margin-bottom: 30px;
+        }
+
+        .checkbox-item {
+            margin-bottom: 10px;
+            font-size: 20px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Night mode styles */
+        .night-mode {
+            background-color: #333;
+            color: #f0f0f0;
+        }
+
+        .night-mode #list-input {
+            background-color: #444;
+            color: #f0f0f0;
+        }
+
+        .night-mode button {
+            background-color: #555;
+        }
+
+        /* Night mode toggle switch */
+        .toggle-switch {
+            position: absolute;
+            top: 20px;
+            right: 50px;
+            width: 40px;
+            height: 20px;
+            background-color: #ccc;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .toggle-switch:before {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 16px;
+            height: 16px;
+            background-color: white;
+            border-radius: 50%;
+            transition: transform 0.3s;
+        }
+
+        .night-mode .toggle-switch {
+            background-color: #444;
+        }
+
+        .night-mode .toggle-switch:before {
+            transform: translateX(20px);
+        }
+
+        /* Uppercase mode styles */
+        .uppercase-mode #list-input,
+        .uppercase-mode #list-output {
+            text-transform: uppercase;
+        }
+
+        /* Uppercase mode toggle switch */
+        .uppercase-toggle {
+            position: absolute;
+            top: 50px;
+            right: 50px;
+            width: 40px;
+            height: 20px;
+            background-color: #ccc;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .uppercase-toggle:before {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 16px;
+            height: 16px;
+            background-color: white;
+            border-radius: 50%;
+            transition: transform 0.3s;
+        }
+
+        .uppercase-toggle.active {
+            background-color: #444;
+        }
+
+        .uppercase-toggle.active:before {
+            transform: translateX(20px);
+        }
+
+        /* Adjust the label's position to avoid overlap */
+        .night-mode-label {
+            position: absolute;
+            top: 20px;
+            right: 100px;
+            font-size: 16px;
+            color: #444;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .night-mode-label i {
+            font-size: 20px;
+        }
+
+        .night-mode .night-mode-label {
+            color: #f0f0f0;
+        }
+
+        /* New description text styling */
+        .description {
+            font-size: 16px;
+            color: #666;
+            text-align: center;
+            margin-top: 10px;
+            margin-bottom: 30px;
+        }
+
+        /* Title with icon */
+        h1 {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-top: 60px; /* Add some space above the title */
+        }
+
+        h1 img {
+            width: 98px;
+            height: 104px;
+            margin-right: 10px;
+            position: relative;
+            top: 10px; /* Adjusted position of the icon */
+        }
+
+        /* Footer styling */
+        footer {
+            background-color: #1e1e1e;
+            color: #9e9e9e;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 12px;
+            text-align: center;
+            padding: 10px;
+            border-top: 2px solid #333;
+            margin-top: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <h1><img src="icon.png" alt="Icon"></h1>
+    <p class="description">"Your go-to minimalist checklist app: type your list, toggle the boxes. Fast, simple, no fuss."</p>
+    <textarea id="list-input" placeholder="Type your list here..."></textarea>
+
+    <div id="list-output"></div>
+
+    <!-- Night mode toggle switch with label -->
+    <div class="toggle-switch" onclick="toggleNightMode()"></div>
+    <label class="night-mode-label" onclick="toggleNightMode()">
+        <i class="moon-icon">🌙</i> Night Mode
+    </label>
+
+    <!-- Uppercase mode toggle switch -->
+    <div class="uppercase-toggle" onclick="toggleUppercaseMode()"></div>
+    <label class="night-mode-label" onclick="toggleUppercaseMode()" style="top: 50px; right: 100px;">
+        <i class="uppercase-icon">🔠</i> Uppercase Mode
+    </label>
+
+<script>
+    // Function to generate the live list with checkboxes
+    document.getElementById('list-input').addEventListener('input', function () {
+        const inputText = this.value;
+        const listOutput = document.getElementById('list-output');
+        listOutput.innerHTML = ''; // Clear previous output
+
+        const lines = inputText.split('\n');
+        lines.forEach(line => {
+            if (line.trim()) {
+                const div = document.createElement('div');
+                div.classList.add('checkbox-item');
+                div.innerHTML = `<input type="checkbox"> <span>${line}</span>`;
+                listOutput.appendChild(div);
+            }
+        });
+    });
+
+    // Function to toggle between night mode and light mode
+    function toggleNightMode() {
+        document.body.classList.toggle('night-mode');
+    }
+
+    // Function to toggle uppercase mode
+    function toggleUppercaseMode() {
+        const body = document.body;
+        const uppercaseToggle = document.querySelector('.uppercase-toggle');
+        const listOutput = document.getElementById('list-output');
+
+        // Toggle the 'uppercase-mode' class on the body
+        body.classList.toggle('uppercase-mode');
+
+        // Toggle the 'active' class for the button
+        uppercaseToggle.classList.toggle('active');
+
+        // Apply uppercase transformation to list items
+        const isUppercase = body.classList.contains('uppercase-mode');
+        const listItems = listOutput.querySelectorAll('.checkbox-item span');
+
+        listItems.forEach(span => {
+            span.textContent = isUppercase ? span.textContent.toUpperCase() : span.textContent.toLowerCase();
+        });
+    }
+</script>
+
+    <footer>
+        <p>Powered by <strong>LiveList</strong> | Version 2.37 | <span style="font-style: italic;">Created by 'j4va'</span></p>
+        <p>© 2025. All rights reserved.</p>
+        <p><span style="color: #00ff00;"><small><code>&#9745; LiveList - Organize, Track, and Achieve.</code></small></span></p>
+    </footer>
+
+</body>
+</html>
