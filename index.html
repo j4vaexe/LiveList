@@ -190,6 +190,37 @@
             border-top: 2px solid #333;
             margin-top: auto;
         }
+
+        #encode-output {
+            margin-top: 20px;
+            font-size: 14px;
+            word-wrap: break-word;
+            background-color: #f9f9f9;
+            padding: 10px;
+            border: 1px solid #ccc;
+        }
+
+        #decode-bar {
+            margin-top: 20px;
+            padding: 10px;
+            width: calc(100% - 22px);
+            font-size: 14px;
+            border: 1px solid #ccc;
+        }
+
+        /* Copy to clipboard button */
+        .copy-btn {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .copy-btn:hover {
+            background-color: #218838;
+        }
     </style>
 </head>
 <body>
@@ -199,6 +230,14 @@
     <textarea id="list-input" placeholder="Type your list here..."></textarea>
 
     <div id="list-output"></div>
+
+    <p class="description">"Encode a list. Decode it later. A simple way to share and send your checklists."</p>
+    <button onclick="encodeList()">Encode</button>
+    <div id="encode-output"></div>
+    <button class="copy-btn" id="copy-btn" style="display: none;" onclick="copyToClipboard()">Copy to Clipboard</button>
+
+    <input id="decode-bar" placeholder="Paste your hash here to decode...">
+    <button onclick="decodeList()">Decode</button>
 
     <!-- Night mode toggle switch with label -->
     <div class="toggle-switch" onclick="toggleNightMode()"></div>
@@ -253,6 +292,53 @@
 
         listItems.forEach(span => {
             span.textContent = isUppercase ? span.textContent.toUpperCase() : span.textContent.toLowerCase();
+        });
+    }
+
+    // Function to encode the list with checkbox states
+    function encodeList() {
+        const listItems = [];
+        const checkboxes = document.querySelectorAll('.checkbox-item');
+
+        checkboxes.forEach(item => {
+            const text = item.querySelector('span').textContent;
+            const checked = item.querySelector('input').checked;
+            listItems.push({ text, checked });
+        });
+
+        const encoded = btoa(JSON.stringify(listItems));
+        document.getElementById('encode-output').textContent = encoded;
+        document.getElementById('copy-btn').style.display = 'inline-block'; // Show the copy button
+    }
+
+    // Function to decode the hash and regenerate the list with checkbox states
+    function decodeList() {
+        const hash = document.getElementById('decode-bar').value;
+        try {
+            const decoded = JSON.parse(atob(hash));
+            const listOutput = document.getElementById('list-output');
+            listOutput.innerHTML = ''; // Clear previous output
+
+            decoded.forEach(item => {
+                const div = document.createElement('div');
+                div.classList.add('checkbox-item');
+                div.innerHTML = `<input type="checkbox" ${item.checked ? 'checked' : ''}> <span>${item.text}</span>`;
+                listOutput.appendChild(div);
+            });
+
+            // Update the input text area as well
+            const listInput = decoded.map(item => item.text).join('\n');
+            document.getElementById('list-input').value = listInput;
+        } catch (error) {
+            alert('Invalid hash. Please try again.');
+        }
+    }
+
+    // Function to copy the encoded list to clipboard
+    function copyToClipboard() {
+        const encodedText = document.getElementById('encode-output').textContent;
+        navigator.clipboard.writeText(encodedText).then(() => {
+            alert('Encoded list copied to clipboard!');
         });
     }
 </script>
